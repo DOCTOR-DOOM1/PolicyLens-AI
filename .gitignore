@@ -1,0 +1,32 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+
+# ── Vector Database (large binary files) ─────────────────────────────────────
+chroma_db/
+
+# ── PDF Source Documents (large files) ───────────────────────────────────────
+data/
+data_backup/
+pdf_data/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+voice_agent_out.log
+live_transcript.txt
+rag_sources.txt
+
+# ── Temp / Build Artifacts ───────────────────────────────────────────────────
+hf_space_tmp/
+hf_dataset_tmp/
+livekit_widget_hosted.html
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
