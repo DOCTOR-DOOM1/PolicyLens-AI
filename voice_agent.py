@@ -72,6 +72,15 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
         self.wfile.write(b"Voice Agent is Live")
+        
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        
+    def log_message(self, format, *args):
+        # Silencing massive health check spam from the load balancer
+        pass
 
 def run_dummy_server():
     server = HTTPServer(('0.0.0.0', 7860), HealthCheckHandler)
