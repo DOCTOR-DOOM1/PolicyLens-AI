@@ -12,7 +12,6 @@ if not os.path.exists("chroma_db/chroma.sqlite3"):
         local_dir_use_symlinks=False,
         token=os.getenv("HF_TOKEN")
     )
-    st.rerun()
 
 # Run the main app
 with open("policylens_ui.py", encoding="utf-8") as f:
