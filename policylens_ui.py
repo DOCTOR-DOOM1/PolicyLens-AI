@@ -4,7 +4,6 @@ from pdf_generator import generate_policy_pdf
 from rag_engine import analyze_eligibility, ask_policylens, compare_policies
 
 # --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="PolicyLens AI", page_icon="🏛️", layout="wide", initial_sidebar_state="expanded")
 
 if 'nav_radio' not in st.session_state:
     st.session_state.nav_radio = "🏠 Home"

@@ -1,6 +1,8 @@
 import os
 import streamlit as st
 
+st.set_page_config(page_title="PolicyLens AI", page_icon="🏛️", layout="wide", initial_sidebar_state="expanded")
+
 # --- Download chroma_db from HF Dataset at startup if not present ---
 if not os.path.exists("chroma_db/chroma.sqlite3"):
     from huggingface_hub import snapshot_download
