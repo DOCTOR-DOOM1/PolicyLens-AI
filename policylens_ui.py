@@ -364,9 +364,6 @@ elif page == "🤖 AI Assistant":
     """, unsafe_allow_html=True)
     
     import os
-    import subprocess
-    import sys
-    import time
     from livekit.api import AccessToken, VideoGrants
     from dotenv import load_dotenv
     load_dotenv()
@@ -374,39 +371,9 @@ elif page == "🤖 AI Assistant":
     st.markdown("<h3 style='margin-top: 30px; margin-bottom: 15px;'>Native Voice Call</h3>", unsafe_allow_html=True)
     st.write("Toggle the switch below to connect to the backend AI and use your microphone natively within this dashboard.")
     
-    if "agent_process" not in st.session_state:
-        st.session_state.agent_process = None
-    if "http_server" not in st.session_state:
-        st.session_state.http_server = None
-        
     on = st.toggle("Power On Backend Voice Agent", value=False)
     
     if on:
-        if st.session_state.agent_process is None:
-            # Start the agent using the correct venv python silently
-            kwargs = {}
-            if os.name == 'nt':
-                kwargs['creationflags'] = 0x08000000 # CREATE_NO_WINDOW
-                # Terminate any existing voice_agent.py processes to avoid port collisions
-                subprocess.run('wmic process where "name=\'python.exe\' and commandline like \'%voice_agent.py%\'" call terminate', capture_output=True, shell=True)
-            else:
-                subprocess.run(['pkill', '-f', 'voice_agent.py'])
-                
-            kwargs["stdout"] = open("voice_agent_out.log", "w")
-            kwargs["stderr"] = subprocess.STDOUT
-            st.session_state.agent_process = subprocess.Popen([sys.executable, "voice_agent.py", "dev"], **kwargs)
-            
-            import socket
-            s = socket.socket()
-            s.bind(('', 0))
-            free_port = s.getsockname()[1]
-            s.close()
-            st.session_state.widget_port = free_port
-            
-            # Start a local HTTP server on the free port to serve the HTML file (fixes Chrome mic blocking)
-            st.session_state.http_server = subprocess.Popen([sys.executable, "-m", "http.server", str(free_port), "--bind", "127.0.0.1"], **kwargs)
-            time.sleep(1) # wait for servers to boot
-            
         # Generate WebRTC Token
         room_name = "policylens-room"
         try:
@@ -425,25 +392,17 @@ elif page == "🤖 AI Assistant":
                 html_code = f.read()
             html_code = html_code.replace("[[LIVEKIT_URL]]", os.getenv("LIVEKIT_URL"))
             html_code = html_code.replace("[[LIVEKIT_TOKEN]]", token)
+
+            import streamlit.components.v1 as components
             
-            # We temporarily write the finalized widget out for the HTTP server to serve
-            with open("livekit_widget_hosted.html", "w", encoding="utf-8") as f:
-                f.write(html_code)
-                
-            iframe_html = f'<iframe src="http://127.0.0.1:{st.session_state.widget_port}/livekit_widget_hosted.html" style="width: 100%; border: none; height: 350px; border-radius: 12px; background: transparent;" allow="microphone"></iframe>'
-            st.markdown(iframe_html, unsafe_allow_html=True)
+            # Securely render the HTML natively within Streamlit's managed components system
+            components.html(html_code, height=370, scrolling=False)
             
-            st.success("✅ Voice Backend Initialized seamlessly on localhost!")
+            st.success("✅ Connected to Cloud Voice Backend!")
         except Exception as e:
             st.error(f"Missing API parameters in .env file: {e}")
             
     else:
-        if st.session_state.agent_process is not None:
-            st.session_state.agent_process.terminate()
-            st.session_state.agent_process = None
-        if st.session_state.http_server is not None:
-            st.session_state.http_server.terminate()
-            st.session_state.http_server = None
         st.info("The agent is offline. Toggle the switch to begin.")
 
 # --- PAGE 5: SETTINGS ---
